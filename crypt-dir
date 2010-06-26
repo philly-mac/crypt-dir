@@ -1,0 +1,117 @@
+#!/usr/bin/env ruby
+
+class CryptDir
+  def initialize(cmd)
+    dir_to_mount(ARGV[1])
+    process_command(cmd)
+  end
+
+  def process_command(cmd)
+    case cmd
+    when "list" then
+      list_dirs
+    when "mount" then
+      mount_dir
+    when "umount" then
+      umount_dir
+    end
+  end
+
+  def list_dirs
+    crypted_dirs.each do |dir|
+      mounted = mounted_encrypted_dirs =~ %r{#{home_dir}/#{dir}}
+      puts "#{dir} #{mounted ? 'Mounted' : 'Unmounted'}"
+    end
+  end
+
+  def mount_dir
+    if !dir_mounted?
+      create_empty_mount_point
+      mount_encrypted_dir
+    end
+  end
+
+  def umount_dir
+    if dir_mounted?
+      umount_encrypted_dir
+      remove_empty_mount_point
+    end
+  end
+
+  private
+
+    def mount_encrypted_dir
+      if !dir_mounted?
+        puts "mounting #{encrypted_dir_full} --> #{dir_to_mount_full}"
+        system "sudo mount -t ecryptfs #{encrypted_dir_full} #{dir_to_mount_full}"
+      end
+    end
+
+    def umount_encrypted_dir
+      if dir_mounted?
+        puts "unmounting #{dir_to_mount_full}"
+        system "sudo umount #{dir_to_mount_full}"
+      end
+    end
+
+    def create_empty_mount_point
+      if !File.exists?(dir_to_mount_full)
+        puts "making directory #{dir_to_mount_full}"
+        system "mkdir #{dir_to_mount_full}"
+      end
+    end
+
+    def remove_empty_mount_point
+      if !dir_mounted?
+        puts "removing empty/unmounted directory #{dir_to_mount_full}"
+        system "rmdir #{dir_to_mount_full}"
+      end
+    end
+
+    def dir_mounted?
+      dir_to_mount && mounted_encrypted_dirs =~ %r{#{dir_to_mount_full}}
+    end
+
+    def user
+      @user ||= `id -un`.strip
+    end
+
+    def crypt_base
+      @crypt_base ||= "/home/private/#{user}"
+    end
+
+    def home_dir
+      @home_dir ||= "/home/#{user}"
+    end
+
+    def mounted_encrypted_dirs
+      `df -t ecryptfs`.strip
+    end
+
+    def crypted_dirs
+      return @crypted_dirs if @crypted_dirs
+
+      @crypted_dirs = []
+      Dir["#{crypt_base}/*"].each do |dir|
+        @crypted_dirs << dir.split("/").last
+      end
+
+      @crypted_dirs = @crypted_dirs.sort
+      @crypted_dirs
+    end
+
+    def dir_to_mount(dir_to_mount = nil)
+      @dir_to_mount = dir_to_mount if dir_to_mount
+      @dir_to_mount
+    end
+
+    def encrypted_dir_full
+      @encrypted_dir_full ||= "#{crypt_base}/#{dir_to_mount}"
+    end
+
+    def dir_to_mount_full
+      @dir_to_mount_full ||= "#{home_dir}/#{dir_to_mount}"
+    end
+end
+
+crypt_dir = CryptDir.new(ARGV.first)
