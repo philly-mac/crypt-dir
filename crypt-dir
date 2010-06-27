@@ -37,7 +37,6 @@ class CryptDir
     if dir_to_mount
       if File.exists?("#{encrypted_dir_full}")
         puts "removing empty directory #{encrypted_dir_full}"
-        system "rmdir \"#{encrypted_dir_full}\""
         exec_cmd(:rmdir_crypt)
         list_dirs
       else
