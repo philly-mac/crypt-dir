@@ -23,9 +23,9 @@ class CryptDir
 
   def setup_dir
     if dir_to_mount
-      if !File.exists?("#{crypt_base}/#{dir_to_mount}")
-        puts "creating #{crypt_base}/#{dir_to_mount}"
-        system "mkdir \"#{crypt_base}/#{dir_to_mount}\""
+      if !File.exists?("#{encrypted_dir_full}")
+        puts "creating #{encrypted_dir_full}"
+        exec_cmd(:mkdir_crypt)
         list_dirs
       else
         puts "Already exists #{encrypted_dir_full}"
@@ -38,6 +38,7 @@ class CryptDir
       if File.exists?("#{encrypted_dir_full}")
         puts "removing empty directory #{encrypted_dir_full}"
         system "rmdir \"#{encrypted_dir_full}\""
+        exec_cmd(:rmdir_crypt)
         list_dirs
       else
         puts "Doesn't exist #{encrypted_dir_full}"
@@ -85,14 +86,14 @@ class CryptDir
     def create_empty_mount_point
       if !File.exists?(dir_to_mount_full)
         puts "making directory #{dir_to_mount_full}"
-        system "mkdir \"#{dir_to_mount_full}\""
+        exec_cmd(:mkdir_mount)
       end
     end
 
     def remove_empty_mount_point
       if !dir_mounted?
         puts "removing empty/unmounted directory #{dir_to_mount_full}"
-        system "rmdir \"#{dir_to_mount_full}\""
+        exec_cmd(:rmdir_mount)
       end
     end
 
@@ -139,6 +140,19 @@ class CryptDir
 
     def dir_to_mount_full
       @dir_to_mount_full ||= "#{home_dir}/#{dir_to_mount}"
+    end
+
+    def exec_cmd(cmd)
+      begin
+        case cmd
+        when :mkdir_crypt ; Dir.mkdir(encrypted_dir_full)
+        when :rmdir_crypt ; Dir.rmdir(encrypted_dir_full)
+        when :mkdir_mount ; Dir.mkdir(dir_to_mount_full)
+        when :rmdir_mount ; Dir.rmdir(dir_to_mount_full)
+        end
+      rescue Exception => e
+        puts "Error: #{e}"
+      end
     end
 end
 
