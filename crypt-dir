@@ -8,12 +8,40 @@ class CryptDir
 
   def process_command(cmd)
     case cmd
+    when "setup" then
+      setup_dir
+    when "teardown" then
+      teardown_dir
     when "list" then
       list_dirs
     when "mount" then
       mount_dir
     when "umount" then
       umount_dir
+    end
+  end
+
+  def setup_dir
+    if dir_to_mount
+      if !File.exists?("#{crypt_base}/#{dir_to_mount}")
+        puts "creating #{crypt_base}/#{dir_to_mount}"
+        system "mkdir \"#{crypt_base}/#{dir_to_mount}\""
+        list_dirs
+      else
+        puts "Already exists #{encrypted_dir_full}"
+      end
+    end
+  end
+
+  def teardown_dir
+    if dir_to_mount
+      if File.exists?("#{encrypted_dir_full}")
+        puts "removing empty directory #{encrypted_dir_full}"
+        system "rmdir \"#{encrypted_dir_full}\""
+        list_dirs
+      else
+        puts "Doesn't exist #{encrypted_dir_full}"
+      end
     end
   end
 
@@ -43,28 +71,28 @@ class CryptDir
     def mount_encrypted_dir
       if !dir_mounted?
         puts "mounting #{encrypted_dir_full} --> #{dir_to_mount_full}"
-        system "sudo mount -t ecryptfs #{encrypted_dir_full} #{dir_to_mount_full}"
+        system "sudo mount -t ecryptfs \"#{encrypted_dir_full}\" \"#{dir_to_mount_full}\""
       end
     end
 
     def umount_encrypted_dir
       if dir_mounted?
         puts "unmounting #{dir_to_mount_full}"
-        system "sudo umount #{dir_to_mount_full}"
+        system "sudo umount \"#{dir_to_mount_full}\""
       end
     end
 
     def create_empty_mount_point
       if !File.exists?(dir_to_mount_full)
         puts "making directory #{dir_to_mount_full}"
-        system "mkdir #{dir_to_mount_full}"
+        system "mkdir \"#{dir_to_mount_full}\""
       end
     end
 
     def remove_empty_mount_point
       if !dir_mounted?
         puts "removing empty/unmounted directory #{dir_to_mount_full}"
-        system "rmdir #{dir_to_mount_full}"
+        system "rmdir \"#{dir_to_mount_full}\""
       end
     end
 
@@ -101,7 +129,7 @@ class CryptDir
     end
 
     def dir_to_mount(dir_to_mount = nil)
-      @dir_to_mount = dir_to_mount if dir_to_mount
+      @dir_to_mount = dir_to_mount if dir_to_mount && !dir_to_mount.empty?
       @dir_to_mount
     end
 
