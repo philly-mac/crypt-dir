@@ -23,7 +23,7 @@ class CryptDir
 
   def setup_dir
     if dir_to_mount
-      if !File.exists?("#{encrypted_dir_full}")
+      if !File.exists?(encrypted_dir_full)
         puts "creating #{encrypted_dir_full}"
         exec_cmd(:mkdir_crypt)
         list_dirs
@@ -35,7 +35,7 @@ class CryptDir
 
   def teardown_dir
     if dir_to_mount
-      if File.exists?("#{encrypted_dir_full}")
+      if File.exists?(encrypted_dir_full)
         puts "removing empty directory #{encrypted_dir_full}"
         exec_cmd(:rmdir_crypt)
         list_dirs
@@ -48,7 +48,7 @@ class CryptDir
   def list_dirs
     crypted_dirs.each do |dir|
       mounted = mounted_encrypted_dirs =~ %r{#{home_dir}/#{dir}}
-      puts "#{dir} #{mounted ? 'Mounted' : 'Unmounted'}"
+      puts "#{dir} --> #{mounted ? 'Mounted' : 'Unmounted'}"
     end
   end
 
