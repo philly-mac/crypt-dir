@@ -14,6 +14,7 @@ class CryptDir
       teardown_dir
     when "list" then
       list_dirs
+      puts encrypted_dir_full
     when "mount" then
       mount_dir
     when "umount" then
@@ -26,6 +27,7 @@ class CryptDir
       if !File.exists?(encrypted_dir_full)
         puts "creating #{encrypted_dir_full}"
         exec_cmd(:mkdir_crypt)
+        system "echo 'true' > #{encrypted_dir_full}/.unencrypted"
         list_dirs
       else
         puts "Already exists #{encrypted_dir_full}"
@@ -56,6 +58,7 @@ class CryptDir
     if !dir_mounted?
       create_empty_mount_point
       mount_encrypted_dir
+      mounted?
     end
   end
 
@@ -67,6 +70,18 @@ class CryptDir
   end
 
   private
+
+    def mounted?
+      test = <<TEST
+        if [ -e "#{dir_to_mount_full}/.unencrypted" ]; then
+          echo "Is unencrypted? "
+          cat "#{dir_to_mount_full}/.unencrypted"
+        else
+          echo "Did not unencrypt"
+        fi
+TEST
+      system test
+    end
 
     def mount_encrypted_dir
       if !dir_mounted?
