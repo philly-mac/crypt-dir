@@ -4,7 +4,7 @@ Small script to allow management of encrypted directories on a linux file system
 - Assumnes all your encryoted directories are located in /home/private/your_username/*
 - Will mount the directories to /home/your_username/directoy_to_be_mounted
 
-Comman and options
+Command and options
 
 crypt-dir [ setup | teardown | mount | umount ] [ directory ]
 
