@@ -6,20 +6,10 @@
 
 Command and options
 
-crypt-dir [ setup | teardown | mount | umount ] [ directory ]
+crypt-dir [ list | setup | teardown | mount | umount ] [ directory ]
 
-  list     - list all directories that could be mounted, and says whethere or not they are mounted
-  setup    - create a new directory in the encrypted location, ready to be mounted
-  teardown - removes an empty directory in the encrypted location
-  mount    - mounts and unencrypts a directory from the encrypted location
-  umount   - unmounts a mount and encrypted directory
-
-# TODO
-
-- cd to root dir
-- make project dir
-- create project structure in project dir
-- checkout project into releases dir
-- symlink current to the just checked out code
-- symlink logfile to the singular log dir
-- symlink conf files to singular conf
+- list     - list all directories that could be mounted, and says whethere or not they are mounted
+- setup    - create a new directory in the encrypted location, ready to be mounted
+- teardown - removes an empty directory in the encrypted location
+- mount    - mounts and unencrypts a directory from the encrypted location
+- umount   - unmounts a mount and encrypted directory
