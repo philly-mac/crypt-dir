@@ -14,14 +14,13 @@ class CryptDir
       teardown_dir
     when "list" then
       list_dirs
-      puts encrypted_dir_full
     when "mount" then
       mount_dir
     when "umount" then
       umount_dir
     else
       cmd_list = <<CMD_LIST
-crypt-dir [ setup | teardown | mount | umount ] [ directory ]
+crypt-dir [ list | setup | teardown | mount | umount ] [ directory ]
 
   list     - list all directories that could be mounted, and says whethere or not they are mounted
   setup    - create a new directory in the encrypted location, ready to be mounted
@@ -77,6 +76,7 @@ CMD_LIST
     if dir_mounted?
       umount_encrypted_dir
       remove_empty_mount_point
+      !mounted?
     end
   end
 

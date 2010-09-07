@@ -1,4 +1,4 @@
-Small script to allow management of encrypted directories on a linux file system
+### Small script to allow management of encrypted directories on a linux file system
 
 - You will need to install ecryptfs
 - Assumnes all your encryoted directories are located in /home/private/your_username/*
@@ -13,3 +13,13 @@ crypt-dir [ setup | teardown | mount | umount ] [ directory ]
   teardown - removes an empty directory in the encrypted location
   mount    - mounts and unencrypts a directory from the encrypted location
   umount   - unmounts a mount and encrypted directory
+
+# TODO
+
+- cd to root dir
+- make project dir
+- create project structure in project dir
+- checkout project into releases dir
+- symlink current to the just checked out code
+- symlink logfile to the singular log dir
+- symlink conf files to singular conf
